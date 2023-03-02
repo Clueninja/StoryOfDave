@@ -7,6 +7,9 @@
 //vin was not here
 
 #include <xc.h>
+#include<stdio.h>
+#include<stdlib.h>
+
 
 //main function
 void main(void) {
