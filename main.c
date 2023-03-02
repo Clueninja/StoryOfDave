@@ -21,7 +21,7 @@ void main(void){
   TRISB = 0x00;                 	//Set PORTB as outputs
   LATB = 0x00;                  	//Turn All LEDs off
   I2C_Initialise();             	//Initialise I2C Master 
-    while(1)
+    while(1) // infinite loop
   {
     
     I2C_Start();                	//Send Start condition to slave
