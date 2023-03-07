@@ -73,13 +73,21 @@ int convert_to_degrees(unsigned char raw_adc){
 
 // check output
 int calc_pwm(enum Side side, int velocity, int degrees){
-    int K = 5;
+    int K = 6;
+    int pwm;
     switch (side){
         case Left:
-            return velocity + K * degrees;
+            pwm =  velocity + K * degrees;
+            if (pwm>255)
+                pwm = 255;
+            break;
         case Right:
-            return velocity - K * degrees;
+            pwm =  velocity - K * degrees;
+            if (pwm<0)
+                pwm = 0;
+            break;
     }
+    return pwm;
 }
 int main(void)
 {
@@ -103,6 +111,10 @@ int main(void)
     for(;;)
     {
         int raw_adc = adc_value(Left);
+        if (raw_adc > 400)
+            velocity = 0;
+        else
+            velocity = 127;
         // int distance = convert_to_distance(raw_adc)
         // increment or decrement velocity depending on adc reading
         
