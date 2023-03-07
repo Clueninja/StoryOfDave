@@ -33,10 +33,17 @@ enum Side{
     Right
 };
 
+void setup_distance_sensors();
+
 void motor_setup();
 void ir_setup();
 void adc_setup();
+unsigned int adc_value(enum Side);
 void motor(enum Side mot, enum Direction dir, unsigned char power);
+void rotate(enum Side side, int degrees);
+
+
+void wait(int del); 	//generates a delay in multiples of 10ms
 
 
 
