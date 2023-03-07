@@ -16,7 +16,7 @@
 #define LED3 LATBbits.LATB4 	//LED3
 #define LED4 LATBbits.LATB5 	//LED4
 
-
+#include "I2C.h"
 #include "utils.h"
 
 int led_flash(void);
@@ -53,7 +53,7 @@ int main(void)
     
     for(;;)
     {
-        int raw_adc = adc_value();
+        int raw_adc = adc_value(Left);
         // int distance = convert_to_distance(raw_adc)
         // increment or decrement velocity depending on adc reading
         
