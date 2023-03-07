@@ -20,16 +20,50 @@
 #include "utils.h"
 
 int led_flash(void);
+// helper function for reading line sensor, once matured might move to utils
+int read_line_sensor(){
+    int linesensor;
+    I2C_Start();                	//Send Start condition to slave
+    I2C_Write(0x7C);            	//Send 7 bit address + Write to slave
+    I2C_Write(0x11);            	//Write data, select RegdataA and send to slave
+    I2C_RepeatedStart();        	//Send repeat start condition
+    I2C_Write(0x7D);            	//Send 7 bit address + Read
+    linesensor=I2C_Read();      	//Read  the IR sensors 
+    I2C_Stop();                 	//Send Stop condition
+    return linesensor;
+}
 
 int main(void)
 {
+    // setup various registers for the devices onboard
     adc_setup();
     motor_setup();
     ir_setup();
     sensor_setup();
+    unsigned char linesensor;    	 //Store raw data from sensor array
+    // not sure which bits actually need to be set
+    TRISC = 0xFF;                	 //Set PORTC as inputs
+    TRISB = 0x00;                 	//Set PORTB as outputs
+    LATB = 0x00;                  	//Turn All LEDs off
+    I2C_Initialise();             	//Initialise I2C Master 
     
-    led_flash();
-    for(;;){
+    int velocity = 800;
+    int max_velocity = 800;
+    int step = 20;
+    
+    for(;;)
+    {
+        int raw_adc = adc_value();
+        // int distance = convert_to_distance(raw_adc)
+        // increment or decrement velocity depending on adc reading
+        
+        linesensor = read_line_sensor();
+        LATB = linesensor;
+        // int degrees = convert_to_degrees(linesensor);
+        // pwm_left = calc_pwm(Left, velocity, degrees);
+        // pwm_right = calc_pwm(Right, velocity, degrees);
+        // motor(Left, Forwards, pwm_left);
+        // motor(Right, Forwards, pwm_right);
         
     }
 }
