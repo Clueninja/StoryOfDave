@@ -1,8 +1,16 @@
 
-#include "motor.h"
+#include "utils.h"
 
 
-void setup_motor(){
+void ir_setup(){
+    TRISAbits.RA2 = 1;
+    TRISAbits.RA3 = 1;
+}
+void adc_setup(){
+    ADCON1 = 0b00001101;
+    ADCON2 = 0b10000010;
+}
+void motor_setup(){
     ADCON1 = 0b00001101;
     // setup pwm shared registers
     PR2 = 0b11111111 ;    	//set period of PWM
@@ -78,3 +86,4 @@ void motor(enum Side mot, enum Direction dir, unsigned char power){
         break;
     }
 }
+

@@ -5,8 +5,8 @@
  * Created on 02 March 2023, 15:14
  */
 
-#ifndef MOTOR_H
-#define	MOTOR_H
+#ifndef UTILS_H
+#define	UTILS_H
 
 
 #include <xc.h>
@@ -33,8 +33,10 @@ enum Side{
     Right
 };
 
+void motor_setup();
+void ir_setup();
+void adc_setup();
 void motor(enum Side mot, enum Direction dir, unsigned char power);
-void setup_motor();
 
 
 

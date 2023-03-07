@@ -23,7 +23,7 @@
 #define LED4 LATBbits.LATB5 	//LED4
 
 
-#include "motor.h"
+#include "utils.h"
 
 #define DSENSOR 400
 
@@ -33,10 +33,6 @@ void wait(int del); 	//generates a delay in multiples of 10ms
 
 void rotate(enum Side side);
 
-void setup_ir(){
-    TRISAbits.RA2 = 1;
-    TRISAbits.RA3 = 1;
-}
 char beacon(enum Side side){
     char value;
     switch (side){
@@ -47,7 +43,6 @@ char beacon(enum Side side){
             value = PORTAbits.RA3;
             break;
     }
-    return 1;
     return !value;
 }
 
@@ -56,10 +51,7 @@ void setup_distance_sensors(){
     TRISAbits.RA0=1;
     TRISAbits.RA1=1;
 }
-void setup_adc(){
-    ADCON1 = 0b00001101;
-    ADCON2 = 0b10000010;
-}
+
 
 void align_beacon(){
     while(1){
@@ -86,7 +78,7 @@ void align_beacon(){
     }
 }
 
-unsigned int distance(enum Side side){
+unsigned int adc_value(enum Side side){
     ADCON0 = side<<2;
     ADCON0 = ADCON0 | (0b11);
     while(ADCON0bits.GO);
@@ -115,17 +107,17 @@ void evasive_action(enum Side side){
 }
  
 void project(){
-    setup_adc();
-    setup_motor();
-    setup_ir();
+    adc_setup();
+    motor_setup();
+    ir_setup();
     setup_distance_sensors();
     
     led_flash();
     while(1){
-        if (distance(Left)>DSENSOR || distance(Right)>DSENSOR){
-            if (distance(Left)>DSENSOR)
+        if (adc_value(Left)>DSENSOR || adc_value(Right)>DSENSOR){
+            if (adc_value(Left)>DSENSOR)
                 evasive_action(Left);
-            if (distance(Right)>DSENSOR)
+            if (adc_value(Right)>DSENSOR)
                 evasive_action(Right);
             // if the beacon is not detected on the left side
             // then the previous obstacle is the beacon

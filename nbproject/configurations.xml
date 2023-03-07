@@ -5,13 +5,13 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>I2C.h</itemPath>
-      <itemPath>motor.h</itemPath>
+      <itemPath>utils.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
-      <itemPath>motor.c</itemPath>
       <itemPath>I2C.c</itemPath>
+      <itemPath>utils.c</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -168,6 +168,14 @@
         <property key="wpo-lto" value="false"/>
       </XC8-config-global>
       <item path="labs.c" ex="true" overriding="false">
+        <HI-TECH-COMP>
+        </HI-TECH-COMP>
+        <HI-TECH-LINK>
+        </HI-TECH-LINK>
+        <XC8-CO>
+        </XC8-CO>
+        <XC8-config-global>
+        </XC8-config-global>
       </item>
     </conf>
   </confs>
