@@ -11,12 +11,6 @@
 #include <stdlib.h>
 
 
-
-#pragma config OSC = HS	//High speed resonator
-#pragma config WDT = OFF   //Watchdog timer off
-#pragma config LVP = OFF   //Low voltage programming disabled
-#pragma config PWRT = ON   //Power up timer on
-#define _XTAL_FREQ 10000000 // define clock frequency for __delay_10ms()
 #define LED1 LATBbits.LATB2 	//LED1
 #define LED2 LATBbits.LATB3 	//LED2
 #define LED3 LATBbits.LATB4 	//LED3
@@ -32,7 +26,7 @@ int main(void)
     adc_setup();
     motor_setup();
     ir_setup();
-    setup_distance_sensors();
+    sensor_setup();
     
     led_flash();
     for(;;){

@@ -10,6 +10,16 @@
 
 
 #include <xc.h>
+
+
+
+#pragma config OSC = HS	//High speed resonator
+#pragma config WDT = OFF   //Watchdog timer off
+#pragma config LVP = OFF   //Low voltage programming disabled
+#pragma config PWRT = ON   //Power up timer on
+#define _XTAL_FREQ 10000000 // define clock frequency for __delay_10ms()
+
+
 #define QUART_LEFT 64
 #define QUART_RIGHT 61
 
@@ -33,7 +43,7 @@ enum Side{
     Right
 };
 
-void setup_distance_sensors();
+void sensor_setup();
 
 void motor_setup();
 void ir_setup();
