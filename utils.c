@@ -9,15 +9,11 @@ void adc_setup(){
     ADCON1 = 0b00001101;
     ADCON2 = 0b10000010;
 }
-
-
 void sensor_setup(){
     // set distance sensors to input
     TRISAbits.RA0=1;
     TRISAbits.RA1=1;
 }
-
-
 unsigned int adc_value(enum Side side){
     ADCON0 = side<<2;
     ADCON0 = ADCON0 | (0b11);
@@ -58,15 +54,7 @@ void wait(int del){     	 //delay function
     	__delay_ms(10);
 	return;
 } 
-void wait_degrees(int degrees){
-    int count=0;
-    while (count<degrees){
-        if(PORTCbits.RC0){
-            count++;
-            while(PORTCbits.RC0);
-        }
-    }
-}
+
 
 void motor(enum Side mot, enum Direction dir, unsigned char power){
     switch (mot){
@@ -118,7 +106,15 @@ void motor(enum Side mot, enum Direction dir, unsigned char power){
     }
 }
 
-
+void wait_degrees(int degrees){
+    int count=0;
+    while (count<degrees){
+        if(PORTCbits.RC0){
+            count++;
+            while(PORTCbits.RC0);
+        }
+    }
+}
 void rotate(enum Side side, int degrees){
     switch(side){
         case Right:
