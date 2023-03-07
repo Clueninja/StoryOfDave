@@ -33,23 +33,72 @@ int read_line_sensor(){
     return linesensor;
 }
 
+int convert_to_degrees(unsigned char raw_adc){
+    switch(raw_adc){
+        case 0xFF:
+            return 0;
+        case 0x01:
+            return 12;
+        case 0x03:
+            return 10;
+        case 0x02:
+            return 9;
+        case 0x06:
+            return 7;
+        case 0x04:
+            return 5;
+        case 0x0C:
+            return 3;
+        case 0x08:
+            return 2;
+        case 0x18:
+            return 0;
+        case 0x10:
+            return -2;
+        case 0x30:
+            return -3;
+        case 0x20:
+            return -5;
+        case 0x60:
+            return -7;
+        case 0x40:
+            return -9;
+        case 0xC0:
+            return -10;
+        case 0x80:
+            return -12;
+    }
+    return 0;
+}
+
+// check output
+int calc_pwm(enum Side side, int velocity, int degrees){
+    int K = 5;
+    switch (side){
+        case Left:
+            return velocity + K * degrees;
+        case Right:
+            return velocity - K * degrees;
+    }
+}
 int main(void)
 {
     // setup various registers for the devices onboard
-    adc_setup();
-    motor_setup();
-    ir_setup();
-    sensor_setup();
+    
     unsigned char linesensor;    	 //Store raw data from sensor array
     // not sure which bits actually need to be set
     TRISC = 0xFF;                	 //Set PORTC as inputs
     TRISB = 0x00;                 	//Set PORTB as outputs
     LATB = 0x00;                  	//Turn All LEDs off
+    adc_setup();
+    motor_setup();
+    ir_setup();
+    sensor_setup();
     I2C_Initialise();             	//Initialise I2C Master 
     
-    int velocity = 800;
-    int max_velocity = 800;
-    int step = 20;
+    int velocity = 127;
+    //int max_velocity = 800;
+    //int step = 20;
     
     for(;;)
     {
@@ -59,11 +108,11 @@ int main(void)
         
         linesensor = read_line_sensor();
         LATB = linesensor;
-        // int degrees = convert_to_degrees(linesensor);
-        // pwm_left = calc_pwm(Left, velocity, degrees);
-        // pwm_right = calc_pwm(Right, velocity, degrees);
-        // motor(Left, Forwards, pwm_left);
-        // motor(Right, Forwards, pwm_right);
+        int degrees = convert_to_degrees(linesensor);
+        int pwm_left = calc_pwm(Left, velocity, degrees);
+        int pwm_right = calc_pwm(Right, velocity, degrees);
+        motor(Left, Forwards, pwm_left);
+        motor(Right, Forwards, pwm_right);
         
     }
 }
