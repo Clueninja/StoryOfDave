@@ -32,11 +32,10 @@ int read_line_sensor(){
     I2C_Stop();                 	//Send Stop condition
     return linesensor;
 }
-
-int convert_to_degrees(unsigned char raw_adc){
-    switch(raw_adc){
-        case 0xFF:
-            return 0;
+// hard coded values to convert from the raw line sensor register
+// to a value in degrees 
+int convert_to_degrees(unsigned char IR_register){
+    switch(IR_register){
         case 0x01:
             return 12;
         case 0x03:
@@ -71,7 +70,8 @@ int convert_to_degrees(unsigned char raw_adc){
     return 0;
 }
 
-// check output
+// Calculates new PWM values based on the side of Dave the motor is on
+// and the current velocity value
 int calc_pwm(enum Side side, int velocity, int degrees){
     int K = 6;
     int pwm;
@@ -91,10 +91,10 @@ int calc_pwm(enum Side side, int velocity, int degrees){
 }
 int main(void)
 {
-    // setup various registers for the devices onboard
+    // setup various registers for the devices on board
     
-    unsigned char linesensor;    	 //Store raw data from sensor array
-    // not sure which bits actually need to be set
+    // not sure which bits actually need to be set so 
+    // I'll overwrite them in the setup
     TRISC = 0xFF;                	 //Set PORTC as inputs
     TRISB = 0x00;                 	//Set PORTB as outputs
     LATB = 0x00;                  	//Turn All LEDs off
@@ -105,26 +105,26 @@ int main(void)
     I2C_Initialise();             	//Initialise I2C Master 
     
     int velocity = 127;
-    //int max_velocity = 800;
+    int max_velocity = 127;
     //int step = 20;
     
     for(;;)
     {
         int raw_adc = adc_value(Left);
+        // stops when hand is in front, 
+        // eventually change to increase and decrease speed with distance
         if (raw_adc > 400)
             velocity = 0;
         else
-            velocity = 127;
-        // int distance = convert_to_distance(raw_adc)
-        // increment or decrement velocity depending on adc reading
+            velocity = max_velocity;
         
-        linesensor = read_line_sensor();
-        LATB = linesensor;
+        unsigned char linesensor = read_line_sensor();
+        LATB = linesensor;                                  // Set LEDs to indicate the line sensor output
         int degrees = convert_to_degrees(linesensor);
-        int pwm_left = calc_pwm(Left, velocity, degrees);
-        int pwm_right = calc_pwm(Right, velocity, degrees);
-        motor(Left, Forwards, pwm_left);
-        motor(Right, Forwards, pwm_right);
+        int pwm_left = calc_pwm(Left, velocity, degrees);   // Calculate PWM for the left wheel
+        int pwm_right = calc_pwm(Right, velocity, degrees); // Calculate PWM for the right wheel
+        motor(Left, Forwards, pwm_left);                    // Set the PWM for the left wheel
+        motor(Right, Forwards, pwm_right);                  // Set the PWM for the right wheel
         
     }
 }
