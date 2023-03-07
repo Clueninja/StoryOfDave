@@ -35,7 +35,6 @@ int read_line_sensor(){
 
 int main(void)
 {
-    // vin add comment
     // setup various registers for the devices onboard
     adc_setup();
     motor_setup();
