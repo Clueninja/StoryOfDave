@@ -1,11 +1,18 @@
+/*
+ * File:   utils.c
+ * Author: samb, Cole P
+ *
+ * Contains utility functions for main.c
+ */
+
 #include "utils.h"
 
 
-void ir_setup(){
+void ir_setup(){  // Sets IR distance PORTA bits for input
     TRISAbits.RA2 = 1;
     TRISAbits.RA3 = 1;
 }
-void adc_setup(){
+void adc_setup(){ 
     ADCON1 = 0b00001101;
     ADCON2 = 0b10000010;
 }
