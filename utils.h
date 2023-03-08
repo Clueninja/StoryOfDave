@@ -58,7 +58,7 @@ void adc_setup();
 unsigned int adc_value(enum Side);
 
 // sets the pwm duty power, the direction for a particular motor
-void motor(enum Side mot, enum Direction dir, unsigned char power);
+void motor(enum Side mot, enum Direction dir, unsigned int power);
 
 // rotates the robot by degrees in a side
 void rotate(enum Side side, int degrees);

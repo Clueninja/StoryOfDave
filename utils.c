@@ -30,7 +30,7 @@ unsigned int adc_value(enum Side side){
 }
 
 void motor_setup(){
-    ADCON1 = 0b11111111;
+    ADCON1 = 0xFF;
     PR2 = 0b11111111 ;     //set period of PWM,610Hz
     T2CON = 0b00000111 ;   //Timer 2(TMR2)on, prescaler = 16 
     CCP1CON = 0b00001100;   //enable CCP1 PWM
@@ -85,7 +85,7 @@ void wait(int del){     	 //delay function
 } 
 
 
-void motor(enum Side mot, enum Direction dir, unsigned char power){
+void motor(enum Side mot, enum Direction dir, unsigned int power){
     switch (mot){
     case Right:
         switch(dir){
@@ -110,7 +110,7 @@ void motor(enum Side mot, enum Direction dir, unsigned char power){
             break;
         }
         CCP1CON = (0x0c)|((power&0x03)<<4);//0x0c enables PWM,then insert the 2 LSB
-        CCPR1L = power>>2; //of markspaceL into CCP1CON and the higher 8 bits into CCPR1L
+        CCPR1L = (power>>2) & 0xFF; //of markspaceL into CCP1CON and the higher 8 bits into CCPR1L
         break;
     case Left:
         switch(dir){
@@ -131,8 +131,8 @@ void motor(enum Side mot, enum Direction dir, unsigned char power){
             PORTAbits.RA5 = 0;
             break;
         }
-        CCP1CON = (0x0c)|((power&0x03)<<4);//0x0c enables PWM,then insert the 2 LSB
-        CCPR1L = power>>2; //of power into CCP2CON and the higher 8 bits into CCPR2L
+        CCP2CON = (0x0c)|((power&0x03)<<4);//0x0c enables PWM,then insert the 2 LSB
+        CCPR2L = (power>>2); //of power into CCP2CON and the higher 8 bits into CCPR2L
         break;
     }
 }
