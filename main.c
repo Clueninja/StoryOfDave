@@ -104,6 +104,13 @@ int calc_velocity(int centimeter, int max_velocity){
             return 0;
     return max_velocity/30 * (centimeter-10);
 }
+
+void change_lap(){
+    rotate(Right, 45);
+    motor(Left, Forwards, 400);
+    motor(Right, Forwards, 400);
+    while(read_line_sensor() & 0xF0 ==0);
+}
 int main(void)
 {
     // setup various registers for the devices on board
@@ -125,7 +132,7 @@ int main(void)
     int velocity;
     int max_velocity = 400;
     //int step = 20;
-    
+    change_lap();
     for(;;)
     {
         int raw_adc = adc_value(Left);
