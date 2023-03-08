@@ -73,13 +73,13 @@ int convert_to_degrees(unsigned char IR_register){
 // Calculates new PWM values based on the side of Dave the motor is on
 // and the current velocity value
 int calc_pwm(enum Side side, int velocity, int degrees){
-    int K = 6;
+    int K = 20;
     int pwm;
     switch (side){
         case Left:
             pwm =  velocity + K * degrees;
-            if (pwm>255)
-                pwm = 255;
+            if (pwm>1023)
+                pwm = 1023;
             break;
         case Right:
             pwm =  velocity - K * degrees;
@@ -121,8 +121,8 @@ int main(void)
     int currently_on_line = 0;      
     int lap_count = 0;
 
-    int velocity = 127;
-    int max_velocity = 127;
+    int velocity;
+    int max_velocity = 400;
     //int step = 20;
     
     for(;;)
