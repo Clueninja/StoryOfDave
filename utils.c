@@ -23,6 +23,28 @@ unsigned int adc_value(enum Side side){
 }
 
 void motor_setup(){
+    ADCON1 = 0b11111111;
+    PR2 = 0b11111111 ;     //set period of PWM,610Hz
+    T2CON = 0b00000111 ;   //Timer 2(TMR2)on, prescaler = 16 
+    CCP1CON = 0b00001100;   //enable CCP1 PWM
+    CCP2CON = 0b00001100;   //enable CCP2 PWM
+    TRISCbits.RC2=0;    //left pwm
+    TRISCbits.RC1=0;    //right pwm
+    // setup right motor
+    TRISBbits.RB0 = 0;
+    TRISBbits.RB1 = 0;
+    //setup left motor
+    TRISAbits.RA4 = 0;
+    TRISAbits.RA5 = 0;
+    // setup motor encoders
+    TRISCbits.RC0=1;
+    TRISCbits.RC5=1;
+    CCPR1L = 0;             //turn left motor off
+    CCPR2L = 0;             //turn Right motor off
+    
+}
+
+void motor_setup_old(){
     ADCON1 = 0b00001101;
     // setup pwm shared registers
     PR2 = 0b11111111 ;    	//set period of PWM
@@ -80,7 +102,8 @@ void motor(enum Side mot, enum Direction dir, unsigned char power){
             PORTBbits.RB1 = 0;
             break;
         }
-        CCPR1L = power;
+        CCP1CON = (0x0c)|((power&0x03)<<4);//0x0c enables PWM,then insert the 2 LSB
+        CCPR1L = power>>2; //of markspaceL into CCP1CON and the higher 8 bits into CCPR1L
         break;
     case Left:
         switch(dir){
@@ -101,7 +124,8 @@ void motor(enum Side mot, enum Direction dir, unsigned char power){
             PORTAbits.RA5 = 0;
             break;
         }
-        CCPR2L = power;
+        CCP1CON = (0x0c)|((power&0x03)<<4);//0x0c enables PWM,then insert the 2 LSB
+        CCPR1L = power>>2; //of power into CCP2CON and the higher 8 bits into CCPR2L
         break;
     }
 }
