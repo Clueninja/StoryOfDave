@@ -89,6 +89,20 @@ int calc_pwm(enum Side side, int velocity, int degrees){
     }
     return pwm;
 }
+
+int millivolts(int raw_adc){
+    return raw_adc * 5;
+}
+int centimeter(int millivolts){
+    return ((millivolts-3000)*(millivolts - 3000))/100000 + 3;
+}
+int calc_velocity(int centimeter, int max_velocity){
+    if (centimeter > 40)
+        return max_velocity;
+    if (centimeter < 10)
+            return 0;
+    return max_velocity/30 * (centimeter-10);
+}
 int main(void)
 {
     // setup various registers for the devices on board
@@ -113,10 +127,9 @@ int main(void)
         int raw_adc = adc_value(Left);
         // stops when hand is in front, 
         // eventually change to increase and decrease speed with distance
-        if (raw_adc > 400)
-            velocity = 0;
-        else
-            velocity = max_velocity;
+        // 
+        int distance = centimeter(millivolts(raw_adc));
+        velocity = calc_velocity(distance, max_velocity);
         
         unsigned char linesensor = read_line_sensor();
         LATB = linesensor;                                  // Set LEDs to indicate the line sensor output
