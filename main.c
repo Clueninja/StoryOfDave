@@ -109,7 +109,7 @@ void change_lap(){
     rotate(Right, 45);
     motor(Left, Forwards, 400);
     motor(Right, Forwards, 400);
-    while(read_line_sensor() & 0xF0 ==0);
+    while(read_line_sensor() & 0xF0 == 0);
 }
 int main(void)
 {
@@ -149,7 +149,6 @@ int main(void)
         int pwm_right = calc_pwm(Right, velocity, degrees); // Calculate PWM for the right wheel
         motor(Left, Forwards, pwm_left);                    // Set the PWM for the left wheel
         motor(Right, Forwards, pwm_right);                  // Set the PWM for the right wheel
-        
     }
 }
 

@@ -51,32 +51,6 @@ void motor_setup(){
     
 }
 
-void motor_setup_old(){
-    ADCON1 = 0b00001101;
-    // setup pwm shared registers
-    PR2 = 0b11111111 ;    	//set period of PWM
-    T2CON = 0b00000111 ;   //Timer 2(TMR2) on, Prescaler = 16
-    TRISCbits.RC2=0;    //left pwm
-    TRISCbits.RC1=0;    //right pwm
-    
-    // setup right motor
-    TRISBbits.RB0 = 0;
-    TRISBbits.RB1 = 0;
-    CCP1CON = (0x0c);        //0x0c enables PWM module CCP1
-
-    //setup left motor
-    TRISAbits.RA4 = 0;
-    TRISAbits.RA5 = 0;
-    CCP2CON = (0x0c);        //0x0c enables PWM module CCP2
-    
-    // setup motor encoders
-    TRISCbits.RC0=1;
-    TRISCbits.RC5=1;
-    
-    motor(Left, Brake,0);
-    motor(Right, Brake,0);
-}
-
 void wait(int del){     	 //delay function
 	int c;
 	for(c=0;c<del;c++)
@@ -132,7 +106,7 @@ void motor(enum Side mot, enum Direction dir, unsigned int power){
             break;
         }
         CCP2CON = (0x0c)|((power&0x03)<<4);//0x0c enables PWM,then insert the 2 LSB
-        CCPR2L = (power>>2); //of power into CCP2CON and the higher 8 bits into CCPR2L
+        CCPR2L = (power>>2) & 0xFF; //of power into CCP2CON and the higher 8 bits into CCPR2L
         break;
     }
 }
@@ -149,12 +123,12 @@ void wait_degrees(int degrees){
 void rotate(enum Side side, int degrees){
     switch(side){
         case Right:
-            motor(Left, Forwards, HALF_LEFT);
-            motor(Right, Backwards, HALF_RIGHT);
+            motor(Left, Forwards, 400);
+            motor(Right, Backwards, 400);
             break;
         case Left:
-            motor(Right, Forwards, HALF_RIGHT);
-            motor(Left, Backwards, HALF_LEFT);
+            motor(Right, Forwards, 400);
+            motor(Left, Backwards, 400);
             break;
     }
     wait_degrees(degrees);
