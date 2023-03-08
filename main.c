@@ -118,6 +118,9 @@ int main(void)
     sensor_setup();
     I2C_Initialise();             	//Initialise I2C Master 
     
+    int currently_on_line = 0;      
+    int lap_count = 0;
+
     int velocity = 127;
     int max_velocity = 127;
     //int step = 20;
@@ -166,3 +169,25 @@ int led_flash(void)
 }
 
 
+/* -- detect line function, still a work in progress -vin
+
+
+int detect_line(IR_register,&currently_on_line,&lap_count)
+{
+    if(IR_register == 0xFF){
+        if(*currently_on_line == 0){
+            line_entered(&lap_count);
+            *currently_on_line = 1;
+        }
+        else{
+            return;
+        }
+    }
+    else{
+        *currently_on_line = 0;
+    }
+    return;
+
+}
+
+*/
