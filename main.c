@@ -94,10 +94,11 @@ int millivolts(int raw_adc){
     return raw_adc * 5;
 }
 int centimeter(int millivolts){
-    return ((millivolts-3000)*(millivolts - 3000))/100000 + 3;
+    //return ((millivolts-3000)*(millivolts - 3000))/100000 + 3;
+    return 43 - (27*millivolts)/2700;
 }
 int calc_velocity(int centimeter, int max_velocity){
-    if (centimeter > 40)
+    if (centimeter > 60)
         return max_velocity;
     if (centimeter < 10)
             return 0;
