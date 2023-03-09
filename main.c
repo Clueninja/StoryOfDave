@@ -107,9 +107,12 @@ int calc_velocity(int centimeter, int max_velocity){
 
 void change_lap(){
     rotate(Right, 45);
-    motor(Left, Forwards, 400);
-    motor(Right, Forwards, 400);
-    while(read_line_sensor() & 0xF0 == 0);
+    motor(Left, Forwards, 200);
+    motor(Right, Forwards, 200);
+    LATB = 0;
+    LED1 = 1;
+    while(read_line_sensor() & 0xC0 == 0);
+    LED1 = 0;
 }
 int main(void)
 {
