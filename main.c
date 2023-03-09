@@ -165,7 +165,6 @@ int main(void)
 
     int velocity;
     int max_velocity = 400;
-    //int step = 20;
     for(;;)
     {
         int raw_adc = adc_value(Left);
@@ -181,7 +180,7 @@ int main(void)
         else{
             velocity = ((mvolts-200)*max_velocity)/2800;
         }
-        //velocity = calc_velocity(distance, max_velocity);
+
         unsigned char linesensor = read_line_sensor();
         int degrees = convert_to_degrees(linesensor);
         int pwm_left = calc_pwm(Left, velocity, degrees);   // Calculate PWM for the left wheel
