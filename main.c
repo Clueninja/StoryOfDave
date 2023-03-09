@@ -105,7 +105,7 @@ int calc_velocity(int centimeter, int max_velocity){
     return (max_velocity * (centimeter-10))/30;
 }
 
-void change_lap(){
+void lane_change(){
     rotate(Right, 45);
     motor(Left, Forwards, 200);
     motor(Right, Forwards, 200);
@@ -113,6 +113,37 @@ void change_lap(){
     LED1 = 1;
     while(read_line_sensor() & 0xC0 == 0);
     LED1 = 0;
+}
+
+void line_entered(int* lap_count){
+    *lap_count += 1;
+    if(*lap_count == 2 || *lap_count == 4){       // switch lanes
+        lane_change();
+    }else if(*lap_count == 3){                   // wait 5s then turn anticlockwise -> clockwise
+        wait(500);
+        rotate(Right, 180);
+    }else if(*lap_count > 4){
+        led_flash();                            //Final LED flash sequence
+        while(1);                               //Infinite loop end of program
+    }
+    return;
+}
+int detect_line(int IR_register,int* currently_on_line,int* lap_count)
+{
+    if(IR_register == 0xFF){
+        if(*currently_on_line == 0){
+            line_entered(lap_count);
+            *currently_on_line = 1;
+        }
+        else{
+            return;
+        }
+    }
+    else{
+        *currently_on_line = 0;
+    }
+    return;
+
 }
 int main(void)
 {
@@ -135,7 +166,6 @@ int main(void)
     int velocity;
     int max_velocity = 400;
     //int step = 20;
-    //change_lap();
     for(;;)
     {
         int raw_adc = adc_value(Left);
@@ -149,8 +179,7 @@ int main(void)
         else if (mvolts <200)
             velocity = max_velocity;
         else{
-            int distance = centimeter(mvolts);
-            velocity = calc_velocity(distance, max_velocity);
+            velocity = ((mvolts-200)*max_velocity)/2800;
         }
         //velocity = calc_velocity(distance, max_velocity);
         unsigned char linesensor = read_line_sensor();
@@ -185,26 +214,3 @@ int led_flash(void)
     LED4 = 0;
 }
 
-
-/* -- detect line function, still a work in progress -vin
-
-
-int detect_line(IR_register,&currently_on_line,&lap_count)
-{
-    if(IR_register == 0xFF){
-        if(*currently_on_line == 0){
-            line_entered(&lap_count);
-            *currently_on_line = 1;
-        }
-        else{
-            return;
-        }
-    }
-    else{
-        *currently_on_line = 0;
-    }
-    return;
-
-}
-
-*/
