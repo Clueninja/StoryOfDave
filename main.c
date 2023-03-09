@@ -102,7 +102,7 @@ int calc_velocity(int centimeter, int max_velocity){
         return max_velocity;
     if (centimeter < 10)
             return 0;
-    return max_velocity/30 * (centimeter-10);
+    return (max_velocity * (centimeter-10))/30;
 }
 
 void change_lap(){
@@ -123,9 +123,9 @@ int main(void)
     TRISC = 0xFF;                	 //Set PORTC as inputs
     TRISB = 0x00;                 	//Set PORTB as outputs
     LATB = 0x00;                  	//Turn All LEDs off
-    adc_setup();
+    
     motor_setup();
-    ir_setup();
+    adc_setup();
     sensor_setup();
     I2C_Initialise();             	//Initialise I2C Master 
     
@@ -135,18 +135,25 @@ int main(void)
     int velocity;
     int max_velocity = 400;
     //int step = 20;
-    change_lap();
+    //change_lap();
     for(;;)
     {
         int raw_adc = adc_value(Left);
         // stops when hand is in front, 
         // eventually change to increase and decrease speed with distance
         // 
-        int distance = centimeter(millivolts(raw_adc));
-        velocity = calc_velocity(distance, max_velocity);
+        int mvolts = millivolts(raw_adc);
         
+        if (mvolts >3000)
+            velocity = 0;
+        else if (mvolts <200)
+            velocity = max_velocity;
+        else{
+            int distance = centimeter(mvolts);
+            velocity = calc_velocity(distance, max_velocity);
+        }
+        //velocity = calc_velocity(distance, max_velocity);
         unsigned char linesensor = read_line_sensor();
-        LATB = linesensor;                                  // Set LEDs to indicate the line sensor output
         int degrees = convert_to_degrees(linesensor);
         int pwm_left = calc_pwm(Left, velocity, degrees);   // Calculate PWM for the left wheel
         int pwm_right = calc_pwm(Right, velocity, degrees); // Calculate PWM for the right wheel
