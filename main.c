@@ -107,14 +107,10 @@ int calc_velocity(int centimeter, int max_velocity){
 
 void lane_change(){
     rotate(Right, 45);
-    motor(Left, Forwards, 200);
-    motor(Right, Forwards, 200);
-    LATB = 0;
-    LED1 = 1;
-    while(read_line_sensor() & 0xC0 == 0){
-        wait(100);
-    }
-    LED1 = 0;
+    motor(Left, Forwards, 400);
+    motor(Right, Forwards, 400);
+    while(read_line_sensor() != 0xC0);
+    rotate(Left, 45);
 }
 
 void line_entered(int* lap_count){
@@ -167,21 +163,17 @@ int main(void)
 
     int velocity;
     int max_velocity = 400;
+    lane_change();
     for(;;)
     {
+        
         int raw_adc = adc_value(Left);
         // stops when hand is in front, 
         // eventually change to increase and decrease speed with distance
         // 
         int mvolts = millivolts(raw_adc);
         
-        if (mvolts >3000)
-            velocity = 0;
-        else if (mvolts <200)
-            velocity = max_velocity;
-        else{
-            velocity = ((mvolts-200)*max_velocity)/2800;
-        }
+        velocity = max_velocity;
 
         unsigned char linesensor = read_line_sensor();
         int degrees = convert_to_degrees(linesensor);
