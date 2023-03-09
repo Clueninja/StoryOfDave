@@ -118,30 +118,35 @@ void line_entered(int* lap_count){
     if(*lap_count == 2 || *lap_count == 4){       // switch lanes
         lane_change();
     }else if(*lap_count == 3){                   // wait 5s then turn anticlockwise -> clockwise
+        motor(Left, Brake, 0);
+        motor(Right, Brake, 0);
         wait(500);
         rotate(Right, 180);
     }else if(*lap_count > 4){
+        motor(Left, Brake, 0);
+        motor(Right, Brake, 0);
         led_flash();                            //Final LED flash sequence
         while(1);                               //Infinite loop end of program
     }
     return;
 }
-int detect_line(int IR_register,int* currently_on_line,int* lap_count)
+void detect_line(int IR_register,int* currently_on_line,int* lap_count)
 {
     if(IR_register == 0xFF){
         if(*currently_on_line == 0){
             line_entered(lap_count);
-            *currently_on_line = 1;
         }
-        else{
-            return;
-        }
+        *currently_on_line = 1;
     }
     else{
         *currently_on_line = 0;
     }
-    return;
+}
 
+void set_leds(char value){
+    LATB = LATB & 0b11000011;
+    value = value & 0x0F;
+    LATB = LATB | (value<<2);
 }
 int main(void)
 {
@@ -163,7 +168,6 @@ int main(void)
 
     int velocity;
     int max_velocity = 400;
-    lane_change();
     for(;;)
     {
         
@@ -176,6 +180,8 @@ int main(void)
         velocity = max_velocity;
 
         unsigned char linesensor = read_line_sensor();
+        detect_line(linesensor, &currently_on_line, &lap_count);
+        set_leds(lap_count);
         int degrees = convert_to_degrees(linesensor);
         int pwm_left = calc_pwm(Left, velocity, degrees);   // Calculate PWM for the left wheel
         int pwm_right = calc_pwm(Right, velocity, degrees); // Calculate PWM for the right wheel
