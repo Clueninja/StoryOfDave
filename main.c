@@ -111,7 +111,9 @@ void lane_change(){
     motor(Right, Forwards, 200);
     LATB = 0;
     LED1 = 1;
-    while(read_line_sensor() & 0xC0 == 0);
+    while(read_line_sensor() & 0xC0 == 0){
+        wait(100);
+    }
     LED1 = 0;
 }
 
