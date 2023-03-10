@@ -142,11 +142,18 @@ void detect_line(int IR_register,int* currently_on_line,int* lap_count)
         *currently_on_line = 0;
     }
 }
-
+// value is 4 bit
 void set_leds(char value){
     LATB = LATB & 0b11000011;
     value = value & 0x0F;
     LATB = LATB | (value<<2);
+}
+
+void display_number(int number){
+    for (int i =0; i<sizeof(int) * 2; i++){
+        set_leds(number>>(i*4));
+        wait(100);
+    }
 }
 int main(void)
 {
@@ -162,7 +169,19 @@ int main(void)
     adc_setup();
     sensor_setup();
     I2C_Initialise();             	//Initialise I2C Master 
-    
+    /*
+     * This code reads out the value from the adc, this is how I got the pain chart
+    while(1){
+        set_leds(0);
+        wait(100);
+        set_leds(0xF);
+        wait(100);
+        set_leds(0);
+        wait(100);
+        int raw_adc = adc_value(Left);
+        display_number(raw_adc);
+    }
+    */
     int currently_on_line = 0;      
     int lap_count = 0;
 
