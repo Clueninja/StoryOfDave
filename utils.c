@@ -22,10 +22,9 @@ void sensor_setup(){
     TRISAbits.RA1=1;
 }
 unsigned int adc_value(enum Side side){
-    ADCON0 = side<<2;
-    ADCON0 = ADCON0 | (0b11);
+    ADCON0 = side<<2 | 0b11;
     while(ADCON0bits.GO);
-    int value = ADRESL | ADRESH<<8;
+    int value = (ADRESH & 0x03)<<8 | ADRESL;
     return value;
 }
 
