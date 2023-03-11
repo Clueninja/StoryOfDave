@@ -91,6 +91,8 @@ int calc_pwm(enum Side side, int velocity, int degrees){
 }
 
 int raw_adc_to_cm(int raw_adc){
+    if (raw_adc < 80)
+        return 30;
     return -16*raw_adc + 463;
 }
 
@@ -175,14 +177,19 @@ int main(void)
     int lap_count = 0;
 
     int velocity;
-    int max_velocity = 400;
+    int base_velocity = 400;
     for(;;)
     {
         
         int raw_adc = adc_value(Left);
-        // stops when hand is in front, 
-        // eventually change to increase and decrease speed with distance
-        velocity = max_velocity;
+        int distance = raw_adc_to_cm(raw_adc);
+        int error = 20 - distance;
+        int K = 10;
+        velocity = base_velocity - K * error;
+        if (velocity > 800)
+            velocity = 800;
+        if (velocity <0)
+            velocity = 0;
 
         unsigned char linesensor = read_line_sensor();
         detect_line(linesensor, &currently_on_line, &lap_count);
