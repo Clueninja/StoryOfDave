@@ -90,19 +90,8 @@ int calc_pwm(enum Side side, int velocity, int degrees){
     return pwm;
 }
 
-int millivolts(int raw_adc){
-    return raw_adc * 5;
-}
-int centimeter(int millivolts){
-    //return ((millivolts-3000)*(millivolts - 3000))/100000 + 3;
-    return 43 - (27*millivolts)/2700;
-}
-int calc_velocity(int centimeter, int max_velocity){
-    if (centimeter > 60)
-        return max_velocity;
-    if (centimeter < 10)
-            return 0;
-    return (max_velocity * (centimeter-10))/30;
+int raw_adc_to_cm(int raw_adc){
+    return -16*raw_adc + 463;
 }
 
 void lane_change(){
@@ -144,9 +133,9 @@ void detect_line(int IR_register,int* currently_on_line,int* lap_count)
 }
 // value is 4 bit
 void set_leds(char value){
-    LATB = LATB & 0b11000011;
+    int temp = LATB & 0b11000011;
     value = value & 0x0F;
-    LATB = LATB | (value<<2);
+    LATB = temp | (value<<2);
 }
 
 void display_number(int number){
@@ -193,9 +182,6 @@ int main(void)
         int raw_adc = adc_value(Left);
         // stops when hand is in front, 
         // eventually change to increase and decrease speed with distance
-        // 
-        int mvolts = millivolts(raw_adc);
-        
         velocity = max_velocity;
 
         unsigned char linesensor = read_line_sensor();
