@@ -175,8 +175,11 @@ int main(void)
     */
     int currently_on_line = 0;      
     int lap_count = 0;
-
+    int error_int = 0;
     int velocity;
+    int Kp = 10;
+    int KI = 1;
+    
     int base_velocity = 400;
     for(;;)
     {
@@ -184,10 +187,12 @@ int main(void)
         int raw_adc = adc_value(Left);
         int distance = raw_adc_to_cm(raw_adc);
         int error = 20 - distance;
-        int K = 10;
-        velocity = base_velocity - K * error;
-        if (velocity > 800)
-            velocity = 800;
+        error_int = error_int + error;
+        
+        velocity =  Kp * error + KI * error_int;
+        
+        if (velocity > 1023)
+            velocity = 1023;
         if (velocity <0)
             velocity = 0;
 
