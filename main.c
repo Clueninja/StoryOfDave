@@ -186,11 +186,23 @@ int main(void)
         
         int raw_adc = adc_value(Left);
         int distance = raw_adc_to_cm(raw_adc);
+        
+        /*
+         * Calculate velocity using PI control
+         * PI is used in this case as the velocity 
+         * needs to be greater than 0 when there is 0 error
+         * 
+         * integer multiplication/ division can be quite poor so 
+         * bit shifting could be used if KI is a power of 2
+         * 
+         * if no robot exists then distance will be around 50 and so 
+         * should speed up as the integral ramps up, to reduce the impact of this
+         * we could 
+        */
         int error = 20 - distance;
         error_int = error_int + error;
-        
         velocity =  Kp * error + KI * error_int;
-        
+        // Saturate output between maximum and minimum
         if (velocity > 1023)
             velocity = 1023;
         if (velocity <0)
