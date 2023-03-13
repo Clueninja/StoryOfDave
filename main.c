@@ -91,9 +91,9 @@ int calc_pwm(enum Side side, int velocity, int degrees){
 }
 
 int raw_adc_to_cm(int raw_adc){
-    if (raw_adc < 80)
-        return 30;
-    return -16*raw_adc + 463;
+    if (raw_adc >130)
+        return (671-raw_adc)/43;
+    return (195-raw_adc)/5;
 }
 
 void lane_change(){
