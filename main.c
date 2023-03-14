@@ -197,7 +197,7 @@ int main(void)
          * 
          * if no robot exists then distance will be around 50 and so 
          * should speed up as the integral ramps up, to reduce the impact of this
-         * we could 
+         * we could clamp the speed to a set value until an object comes close
         */
         int error = 20 - distance;
         error_int = error_int + error;
