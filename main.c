@@ -73,7 +73,7 @@ int convert_to_degrees(unsigned char IR_register){
 // Calculates new PWM values based on the side of Dave the motor is on
 // and the current velocity value
 int calc_pwm(enum Side side, int velocity, int degrees){
-    int K = 20;
+    int K = 40;
     int pwm;
     switch (side){
         case Left:
@@ -100,7 +100,8 @@ void lane_change(){
     rotate(Right, 45);
     motor(Left, Forwards, 400);
     motor(Right, Forwards, 400);
-    while(read_line_sensor() != 0xC0);
+    wait(100);
+    while(read_line_sensor() != 0b01111111);
     rotate(Left, 45);
 }
 
@@ -177,7 +178,7 @@ int main(void)
     int lap_count = 0;
     int error_int = 0;
     int velocity;
-    int Kp = 10;
+    int Kp = 30;
     int KI = 1;
     
     int base_velocity = 400;
@@ -199,16 +200,17 @@ int main(void)
          * should speed up as the integral ramps up, to reduce the impact of this
          * we could clamp the speed to a set value until an object comes close
         */
-        int error = 20 - distance;
+        int error = distance-10;
         error_int = error_int + error;
-        velocity =  Kp * error + KI * error_int;
+        velocity =  Kp * error;// + error_int>>5;
         // Saturate output between maximum and minimum
-        if (velocity > 1023)
-            velocity = 1023;
-        if (velocity <0)
-            velocity = 0;
+        if (velocity > 500)
+            velocity = 500;
+        if (velocity <50)
+            velocity = 50;
 
         unsigned char linesensor = read_line_sensor();
+        linesensor = ~linesensor;
         detect_line(linesensor, &currently_on_line, &lap_count);
         set_leds(lap_count);
         int degrees = convert_to_degrees(linesensor);

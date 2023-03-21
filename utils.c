@@ -120,6 +120,9 @@ void wait_degrees(int degrees){
     }
 }
 void rotate(enum Side side, int degrees){
+    motor(Right, Brake, 0);
+    motor(Left, Brake, 0);
+    wait(20);
     switch(side){
         case Right:
             motor(Left, Forwards, 400);
