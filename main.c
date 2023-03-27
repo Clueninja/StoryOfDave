@@ -73,7 +73,7 @@ int convert_to_degrees(unsigned char IR_register){
 // Calculates new PWM values based on the side of Dave the motor is on
 // and the current velocity value
 int calc_pwm(enum Side side, int velocity, int degrees){
-    int K = 40;
+    int K = 60;
     int pwm;
     switch (side){
         case Left:
@@ -97,17 +97,22 @@ int raw_adc_to_cm(int raw_adc){
 }
 
 void lane_change(){
-    rotate(Right, 45);
+    motor(Left, Forwards, 500);
+    motor(Right, Forwards, 200);
+    wait(80);
     motor(Left, Forwards, 400);
     motor(Right, Forwards, 400);
-    wait(100);
     while(read_line_sensor() != 0b01111111);
-    rotate(Left, 45);
+    motor(Left, Forwards, 200);
+    motor(Right, Forwards, 500);
+    wait(80);
 }
 
 void line_entered(int* lap_count){
     *lap_count += 1;
-    if(*lap_count == 2 || *lap_count == 4){       // switch lanes
+    if(*lap_count == 2){       // switch lanes
+        lane_change();
+    }else if (*lap_count == 4){
         lane_change();
     }else if(*lap_count == 3){                   // wait 5s then turn anticlockwise -> clockwise
         motor(Left, Brake, 0);
@@ -120,7 +125,6 @@ void line_entered(int* lap_count){
         led_flash();                            //Final LED flash sequence
         while(1);                               //Infinite loop end of program
     }
-    return;
 }
 void detect_line(int IR_register,int* currently_on_line,int* lap_count)
 {
@@ -149,6 +153,8 @@ void display_number(int number){
 }
 int main(void)
 {
+    
+
     // setup various registers for the devices on board
     
     // not sure which bits actually need to be set so 
@@ -180,8 +186,7 @@ int main(void)
     int velocity;
     int Kp = 30;
     int KI = 1;
-    
-    int base_velocity = 400;
+    led_flash();
     for(;;)
     {
         
@@ -206,8 +211,8 @@ int main(void)
         // Saturate output between maximum and minimum
         if (velocity > 500)
             velocity = 500;
-        if (velocity <50)
-            velocity = 50;
+        if (velocity <63)
+            velocity = 63;
 
         unsigned char linesensor = read_line_sensor();
         linesensor = ~linesensor;
@@ -226,17 +231,17 @@ int led_flash(void)
 {
     TRISB=0b11000000; 	  	    //configure Port B, RB0 to RB5 as outputs
     LATB=0;               	 //turn all LEDs off
-    for (int i = 0; i < 3; i++){
+    for (int i = 0; i < 5; i++){
         LED1 = 0;
         LED2 = 0;
         LED3 = 0;
         LED4 = 0;
-        wait(100);
+        wait(50);
         LED1 = 1;
         LED2 = 1;
         LED3 = 1;
         LED4 = 1;
-        wait(100);
+        wait(50);
 	}
     LED1 = 0;
     LED2 = 0;
