@@ -1,6 +1,6 @@
 /*
  * File:   utils.c
- * Author: samb, Cole P
+ * Author: Sam Brown, Cole P, Vin
  *
  * Contains utility functions for main.c
  */

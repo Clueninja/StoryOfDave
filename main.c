@@ -126,7 +126,7 @@ void line_entered(int* lap_count){
         while(1);                               //Infinite loop end of program
     }
 }
-void detect_line(int IR_register,int* currently_on_line,int* lap_count)
+void detect_line(int IR_register,int *currently_on_line,int *lap_count)
 {
     if(IR_register == 0xFF){
         if(*currently_on_line == 0){
@@ -168,7 +168,8 @@ int main(void)
     sensor_setup();
     I2C_Initialise();             	//Initialise I2C Master 
     /*
-     * This code reads out the value from the adc, this is how I got the pain chart
+    // This code reads out the value from the adc, in binary, from the LEDs.
+    // this is how I got the pain chart
     while(1){
         set_leds(0);
         wait(100);
@@ -182,7 +183,7 @@ int main(void)
     */
     int currently_on_line = 0;      
     int lap_count = 0;
-    int error_int = 0;
+    long long error_int = 0;
     int velocity;
     int Kp = 30;
     int KI = 1;
@@ -207,7 +208,7 @@ int main(void)
         */
         int error = distance-10;
         error_int = error_int + error;
-        velocity =  Kp * error;// + error_int>>5;
+        velocity =  Kp * error;//  + error_int>>5;
         // Saturate output between maximum and minimum
         if (velocity > 500)
             velocity = 500;

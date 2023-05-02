@@ -1,6 +1,5 @@
 /*
  * File:   I2C.c
- * Author: samb
  *
  * Created on 02 March 2023, 13:13
  */
