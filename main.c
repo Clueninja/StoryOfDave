@@ -97,24 +97,29 @@ int raw_adc_to_cm(int raw_adc){
 }
 
 void lane_change(){
-    motor(Left, Forwards, 500);
-    motor(Right, Forwards, 200);
-    wait(80);
     motor(Left, Forwards, 400);
     motor(Right, Forwards, 400);
-    while(read_line_sensor() != 0b01111111);
-    motor(Left, Forwards, 200);
+    while(read_line_sensor() & 0b00100000 != 0);
+    motor(Left, Forwards, 300);
     motor(Right, Forwards, 500);
     wait(80);
 }
 
-void line_entered(int* lap_count){
+void line_entered(int *lap_count){
     *lap_count += 1;
-    if(*lap_count == 2){       // switch lanes
+    // switch lane
+    if(*lap_count == 2){
+        motor(Left, Forwards, 500);
+        motor(Right, Forwards, 200);
+        wait(80);
         lane_change();
     }else if (*lap_count == 4){
+        motor(Left, Forwards, 400);
+        motor(Right, Forwards, 200);
+        wait(80);
         lane_change();
-    }else if(*lap_count == 3){                   // wait 5s then turn anticlockwise -> clockwise
+     // wait 5s then turn anticlockwise -> clockwise
+    }else if(*lap_count == 3){
         motor(Left, Brake, 0);
         motor(Right, Brake, 0);
         wait(500);
@@ -122,8 +127,10 @@ void line_entered(int* lap_count){
     }else if(*lap_count > 4){
         motor(Left, Brake, 0);
         motor(Right, Brake, 0);
-        led_flash();                            //Final LED flash sequence
-        while(1);                               //Infinite loop end of program
+        //Final LED flash sequence
+        led_flash();
+        //Infinite loop end of program
+        while(1);
     }
 }
 void detect_line(int IR_register,int *currently_on_line,int *lap_count)
@@ -159,14 +166,18 @@ int main(void)
     
     // not sure which bits actually need to be set so 
     // I'll overwrite them in the setup
-    TRISC = 0xFF;                	 //Set PORTC as inputs
-    TRISB = 0x00;                 	//Set PORTB as outputs
-    LATB = 0x00;                  	//Turn All LEDs off
+    //Set PORTC as inputs
+    TRISC = 0xFF;
+    //Set PORTB as outputs
+    TRISB = 0x00;
+    //Turn All LEDs off
+    LATB = 0x00;
     
     motor_setup();
     adc_setup();
     sensor_setup();
-    I2C_Initialise();             	//Initialise I2C Master 
+    //Initialise I2C Master 
+    I2C_Initialise();
     /*
     // This code reads out the value from the adc, in binary, from the LEDs.
     // this is how I got the pain chart
@@ -210,8 +221,8 @@ int main(void)
         error_int = error_int + error;
         velocity =  Kp * error;//  + error_int>>5;
         // Saturate output between maximum and minimum
-        if (velocity > 500)
-            velocity = 500;
+        if (velocity > 450)
+            velocity = 450;
         if (velocity <63)
             velocity = 63;
 
@@ -220,18 +231,24 @@ int main(void)
         detect_line(linesensor, &currently_on_line, &lap_count);
         set_leds(lap_count);
         int degrees = convert_to_degrees(linesensor);
-        int pwm_left = calc_pwm(Left, velocity, degrees);   // Calculate PWM for the left wheel
-        int pwm_right = calc_pwm(Right, velocity, degrees); // Calculate PWM for the right wheel
-        motor(Left, Forwards, pwm_left);                    // Set the PWM for the left wheel
-        motor(Right, Forwards, pwm_right);                  // Set the PWM for the right wheel
+        // Calculate PWM for the left wheel
+        int pwm_left = calc_pwm(Left, velocity, degrees);
+        // Calculate PWM for the right wheel
+        int pwm_right = calc_pwm(Right, velocity, degrees);
+        // Set the PWM for the left wheel
+        motor(Left, Forwards, pwm_left);
+        // Set the PWM for the right wheel
+        motor(Right, Forwards, pwm_right);
     }
 }
 
 
 int led_flash(void)
 {
-    TRISB=0b11000000; 	  	    //configure Port B, RB0 to RB5 as outputs
-    LATB=0;               	 //turn all LEDs off
+    //configure Port B, RB0 to RB5 as outputs
+    TRISB=0b11000000;
+    //turn all LEDs off
+    LATB=0;
     for (int i = 0; i < 5; i++){
         LED1 = 0;
         LED2 = 0;
